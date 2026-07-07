@@ -74,7 +74,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- swagger UI : localhost/swagger-ui/ -->
+        <!-- swagger UI : localhost/swagger-ui/index.html -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
