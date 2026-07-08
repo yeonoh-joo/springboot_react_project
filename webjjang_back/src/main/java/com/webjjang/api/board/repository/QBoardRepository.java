@@ -6,4 +6,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface QBoardRepository
 extends JpaRepository<Board, Long>, QuerydslPredicateExecutor<Board> {
+
+    Long deleteByNoAndPw(Long no, String pw);
 }
