@@ -1,7 +1,7 @@
-package com.webjjang.api.board.controller;
+package com.webjjang.api.image.controller;
 
-import com.webjjang.api.board.service.BoardService;
-import com.webjjang.api.board.vo.BoardVO;
+import com.webjjang.api.image.service.ImageService;
+import com.webjjang.api.image.vo.ImageVO;
 import com.webjjang.api.util.page.PageObject;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/image")
 @Log4j2
 @RequiredArgsConstructor // private final 변수 자동 DI 어노테이션
 @CrossOrigin(origins = "http://localhost:5173") // react 서버로 데이터 공유 허용해준다.
-public class BoardRestController {
+public class ImageRestController {
 
-    private final BoardService service;
+    private final ImageService service;
 
     // 1. list
     @GetMapping("/list.do")
@@ -39,14 +39,14 @@ public class BoardRestController {
 
     // 2. view
     @GetMapping("/view.do")
-    public ResponseEntity<BoardVO> view(Long no, Integer inc){
+    public ResponseEntity<ImageVO> view(Long no, Integer inc){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(service.view(no, inc));
     }
 
     // 3. write
     @PostMapping("/write.do")
-    public ResponseEntity<String> write(@RequestBody BoardVO vo){
+    public ResponseEntity<String> write(@RequestBody ImageVO vo){
         log.info("[write] vo = {}",vo);
         service.write(vo);
         return ResponseEntity.status(HttpStatus.OK)
@@ -55,7 +55,7 @@ public class BoardRestController {
 
     // 4. update
     @PostMapping("/update.do")
-    public ResponseEntity<String> update(@RequestBody BoardVO vo){
+    public ResponseEntity<String> update(@RequestBody ImageVO vo){
         service.update(vo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("일반 게시판 글수정이 성공적으로 되었습니다.");
@@ -63,7 +63,7 @@ public class BoardRestController {
 
     // 5. delete
     @PostMapping("/delete.do")
-    public ResponseEntity<String> delete(@RequestBody BoardVO vo){
+    public ResponseEntity<String> delete(@RequestBody ImageVO vo){
         service.delete(vo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("일반 게시판 글삭제가 성공적으로 되었습니다.");
