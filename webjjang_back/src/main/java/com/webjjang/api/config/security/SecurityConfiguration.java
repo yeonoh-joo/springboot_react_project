@@ -36,12 +36,12 @@ public class SecurityConfiguration {
                         authorize
                                 // 인증(Authentication) 없이 모든 사용자의 접근을 허용 - permitAll()
                                 .requestMatchers("/swagger",
-                                "/swagger-ui.html", "/swagger-ui/**", "/api-docs",
-                                "/api-docs/**", "/v3/api-docs/**" ).permitAll()
+                                        "/swagger-ui.html", "/swagger-ui/**", "/api-docs",
+                                        "/api-docs/**", "/v3/api-docs/**" ).permitAll()
                                 .requestMatchers("/sign-api/sign-up", "/sign-api/sign-in",
                                         "/sign-api/exception").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
-                                .requestMatchers("**/board/**").permitAll()
+                                .requestMatchers("/board/**").permitAll()
                                 .requestMatchers("**exception**").permitAll()
                                 // 앞에서 정의한 URL을 제외한 모든 요청은 ADMIN 역할(Role)을 가진 사용자만
                                 // 접근할 수 있도록 하는 인가(Authorization) 규칙

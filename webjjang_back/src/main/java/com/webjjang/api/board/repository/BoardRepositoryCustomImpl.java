@@ -108,29 +108,12 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     // 1. 방법 : 기본 CRUD의 수정은 먼저 데이터를 꺼내온다(findById()) -> 꺼내온 데이터 변경(JAVA에서)
     // -> 수정된 내용은 DB에 저장(save()) : @LastModifiedDate 수정날짜 자동 변경됨
     // 2. QueryFactory 사용 : 수정 쿼리 실행 - @LastModifiedDate 수정날짜 자동 변경 안 됨
-    public Long updateBoard(Board boardData) {
-        return queryFactory
-                .update(board)
-                .set(board.title, boardData.getTitle())
-                .set(board.content, boardData.getContent())
-                .set(board.writer, boardData.getWriter())
-                .where(
-                        board.no.eq(boardData.getNo()),
-                        board.pw.eq(boardData.getPw())
-                )
-                .execute();
+    public Board updateBoard(Board boardData) {
+        return qBoardRepository.save(boardData);
     }
 
     @Override
-    public Long deleteBoard(Board boardData) {
-//        return queryFactory
-//                .delete(board)
-//                .where(
-//                        board.no.eq(boardData.getNo()),
-//                        board.pw.eq(boardData.getPw())
-//                )
-//                .execute();
-
-        return qBoardRepository.deleteByNoAndPw(boardData.getNo(), boardData.getPw());
+    public void deleteBoard(Long no) {
+        qBoardRepository.deleteById(no);
     }
 }
