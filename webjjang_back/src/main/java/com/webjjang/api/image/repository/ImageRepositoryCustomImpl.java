@@ -27,7 +27,8 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
                 .select(
                         image.no,
                         image.title,
-                        image.writer,
+                        image.member.id,
+                        image.member.name,
                         image.hit,
                         image.writeDate
                 )
@@ -56,8 +57,8 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
             builder.or(image.content.contains(word));
 
         // key에 w가 포함이 되어있으면 작성자에서 검색
-        if(key.contains("w"))
-            builder.or(image.writer.contains(word));
+        if(key.contains("i"))
+            builder.or(image.member.id.contains(word));
 
         return builder;
     }
@@ -78,7 +79,8 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
                         image.no,
                         image.title,
                         image.content,
-                        image.writer,
+                        image.member.id,
+                        image.member.name,
                         image.writeDate,
                         image.hit
                 )

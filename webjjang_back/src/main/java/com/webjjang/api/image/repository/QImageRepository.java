@@ -7,5 +7,4 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 public interface QImageRepository
 extends JpaRepository<Image, Long>, QuerydslPredicateExecutor<Image> {
 
-    Long deleteByNoAndPw(Long no, String pw);
 }

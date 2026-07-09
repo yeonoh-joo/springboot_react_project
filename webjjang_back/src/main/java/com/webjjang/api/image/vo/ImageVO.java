@@ -11,7 +11,6 @@ public class ImageVO {
     private String title;
     private String content;
     private String member;
-    private String writer;
     private Long hit;
     private LocalDateTime writeDate;
     private LocalDateTime updateDate;

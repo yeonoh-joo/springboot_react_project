@@ -33,9 +33,6 @@ public class Image {
     @ToString.Exclude
     private Member member;
 
-    @Column(nullable = false, length = 30)
-    private String writer;
-
     @CreatedDate
     @Column(updatable = false)  // 한 번 등록하면 변경하지 않는다.
     private LocalDateTime writeDate;
