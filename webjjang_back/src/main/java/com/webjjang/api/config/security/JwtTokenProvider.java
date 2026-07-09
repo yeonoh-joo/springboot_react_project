@@ -18,13 +18,14 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor // private final 변수 중 초기값을 세팅하지 않은 변수를 생성자로 DI 적용
 @Log4j2
-// JWT : JSON Web Token
+// JWT : JSON Web Token - 토큰 관리 프로그램.
 public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
@@ -36,10 +37,10 @@ public class JwtTokenProvider {
     @Value("${springboot.jwt.secret}")
     private  String secretKey;
 
-    // secrestKey를 이용해서 암호화된 Key를 만들어서 저장해 놓는다. - 한 번만 하면 된다. init()에서 처리
+    // secretKey를 이용해서 암호화된 Key를 만들어서 저장해 놓는다.- 한번만 하면된다. init()에서 처리
     private Key key;
 
-    // token의 유효 시간 세팅 - 1시간 : 1000L - 1초 * 60 - 분 * 60 - 시간
+    // token의 유효 시간을 세팅 - 1시간 : 1000L - 1초 * 60 - 분 * 60 - 시간
     private  final  long tokenValidMillisecond = 1000L * 60 * 60;
 
 
@@ -50,22 +51,22 @@ public class JwtTokenProvider {
         log.info("[init] JwtTokenProvider 내 secretKey 이용 key 초기화 시작");
 
         // secretKey를 가지고 문자 배열로 만들어 key 생성한다.
-        // secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
+//        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
         key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
         log.info("[init] JwtTokenProvider 내 secretKey 이용 key 초기화 초기화 완료");
     }
 
-    // 토큰을 만드는 메서드 - 정상적인 로그인이 처리되고 토큰이 없으면 실행
+    // 토큰을 만드는 메서드 - 정상적인 로그인이 처리되고 (토근이 없으면) 실행
     public String createToken(String userUid, List<String> roles){
         log.info("[createToken] 토큰 생성 시작");
         Claims claims = Jwts.claims().setSubject(userUid);
         claims.put("roles",roles);
         Date now = new Date();
 
-//        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        // Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         String token = Jwts.builder()
-                .setClaims(claims)  // 사용자 정보
+                .setClaims(claims) // 사용자 정보
                 .setIssuedAt(now) // 토큰 시작 시간 = 발급 시간
                 // 토큰의 유효 시간 tokenValidMillisecond - 1000*60*60(1시간)
                 .setExpiration(new Date(now.getTime() + tokenValidMillisecond))
@@ -77,7 +78,7 @@ public class JwtTokenProvider {
         return token;
     }
 
-    // 토큰에서 사용자 이름을 꺼내는 메서드 - 토큰을
+    // 토큰에서 사용자 이름을 꺼내는 메서드 - 토큰을 가지고 들어온 경우의 처리
     public String getUsername(String token){
         log.info("[getUsername] 토큰 기반 회원 구별 정보 추출 시작");
 
@@ -106,13 +107,14 @@ public class JwtTokenProvider {
                 (userDetails, "", userDetails.getAuthorities());
     }
 
-    // 클라이언트 -> 서버로 정보가 전되는데 이때 request 객체가 받는다. 헤더가 포함되어 있다.
+    // 클라이언트 -> 서버로 정보가 전달되는데 이때 request 객체가 받는다. 헤더가 포함되어 있다.
     // 토큰을 헤더에 담아서 전달한다.
     public String resolveToken(HttpServletRequest request){
         log.info("[resolveToken] Http 헤더에서 Token 값을 추출");
         return request.getHeader("X-AUTH-TOKEN");
     }
 
+    // 토큰이 유효한지 체크하는 메서드
     public  boolean validateToken(String token){
         log.info("[validateToken] 토큰 유효 체크 시작");
         try {

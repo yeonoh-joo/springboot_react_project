@@ -1,7 +1,9 @@
 -- 1. 객체 제거 (FK -> PK)
 DROP table if exists board;
 
-DROP table if exists MEMBER;
+drop table if exists image
+
+DROP table if exists member;
 
 DROP table if exists member_roles;
 
@@ -25,6 +27,18 @@ create table board (
   pw varchar(255) not null,
   primary key (no)
 ) engine=INNODB;
+
+create table image (
+  hit BIGINT,
+  no bigint not null auto_increment,
+  updated_date datetime(6),
+  writed_date datetime(6),
+  title varchar(300) not null,
+  content text not null,
+  file_name varchar(255) not null,
+  member_id varchar(255),
+  PRIMARY key (no)
+) engine=InnoDB
 
 create table member (
   gender varchar(2) not null,
@@ -74,6 +88,11 @@ create table product (
 -- 3. 제약 조건 설정
 ALTER table if exists user 
  add constraint UKa7hlm8sj8kmijx6ucp7wfyt31 unique (uid);
+ 
+alter table if exists image 
+ add constraint FKnnvd0itj2hhoyuua7g3ive7vo 
+ foreign key (member_id) 
+ REFERENCES member (id)
 
 alter table if exists board 
  add constraint FKsds8ox89wwf6aihinar49rmfy 

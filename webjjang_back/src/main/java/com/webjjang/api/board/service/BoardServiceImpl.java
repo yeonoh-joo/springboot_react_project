@@ -6,7 +6,7 @@ import com.webjjang.api.board.repository.BoardRepositoryCustom;
 import com.webjjang.api.board.repository.QBoardRepository;
 import com.webjjang.api.board.vo.BoardVO;
 import com.webjjang.api.util.page.PageObject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
+@Log4j2
 public class BoardServiceImpl implements BoardService {
 
     @Autowired
@@ -57,6 +57,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    @Transactional
     public BoardVO view(Long no, Integer inc) {
         if(inc == 1) boardRepositoryCustom.increaseHit(no);
         Tuple tuple = boardRepositoryCustom.getBoard(no);
@@ -65,8 +66,8 @@ public class BoardServiceImpl implements BoardService {
         vo.setTitle(tuple.get(1, String.class));
         vo.setContent(tuple.get(2, String.class));
         vo.setWriter(tuple.get(3, String.class));
-        vo.setHit(tuple.get(4, Long.class));
-        vo.setWriteDate(tuple.get(5, LocalDateTime.class));
+        vo.setWriteDate(tuple.get(4, LocalDateTime.class));
+        vo.setHit(tuple.get(5, Long.class));
         return vo;
     }
 
@@ -78,8 +79,8 @@ public class BoardServiceImpl implements BoardService {
         vo.setContent(board.getContent());
         vo.setWriter(board.getWriter());
         vo.setHit(board.getHit());
-        vo.setWriteDate(board.getWriteDate());
-        vo.setUpdateDate(board.getUpdateDate());
+        vo.setWriteDate(board.getWritedDate());
+        vo.setUpdateDate(board.getUpdatedDate());
         vo.setPw(board.getPw());
         return vo;
     }
@@ -91,8 +92,8 @@ public class BoardServiceImpl implements BoardService {
         board.setTitle(vo.getTitle());
         board.setContent(vo.getContent());
         board.setWriter(vo.getWriter());
-        board.setWriteDate(vo.getWriteDate());
-        board.setUpdateDate(vo.getUpdateDate());
+        board.setWritedDate(vo.getWriteDate());
+        board.setUpdatedDate(vo.getUpdateDate());
         board.setPw(passwordEncoder.encode(vo.getPw()));
         return board;
     }
@@ -111,12 +112,13 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public Long update(BoardVO vo) {
         log.info("[update] boardVOToBoard(vo) = {}", boardVOToBoard(vo));
-        // pw를 포함한 데이터를 먼저 가져온다.
+        // pw를 포함 데이터를 먼저 가져온다.
         Optional<Board> optional = qBoardRepository.findById(vo.getNo());
-        if (optional.isEmpty()) throw new RuntimeException("일반게시판 수정 오류 - 글 번호 확인");
+        if(optional.isEmpty())
+            throw new RuntimeException("일반 게시판 수정 오류 - 글번호 확인");
         Board board = optional.get();
-        if (passwordEncoder.matches(vo.getPw(), board.getPw()))
-            throw new RuntimeException("일반게시판 수정 오류 - 비밀번호 확인");
+        if(!passwordEncoder.matches(vo.getPw(), board.getPw()))
+            throw new RuntimeException("일반 게시판 수정 오류 - 비밀번호 확인");
         // 수정할 데이터로 변경 : board
         board.setTitle(vo.getTitle());
         board.setContent(vo.getContent());
@@ -132,13 +134,14 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public Long delete(BoardVO vo) {
 
-        // pw를 포함한 데이터를 먼저 가져온다.
+        // pw를 포함 데이터를 먼저 가져온다.
         Optional<Board> optional = qBoardRepository.findById(vo.getNo());
-        if (optional.isEmpty()) throw new RuntimeException("일반게시판 삭제 오류 - 글 번호 확인");
+        if(optional.isEmpty())
+            throw new RuntimeException("일반 게시판 삭제 오류 - 글번호 확인");
         Board board = optional.get();
-        if (passwordEncoder.matches(vo.getPw(), board.getPw()))
-            throw new RuntimeException("일반게시판 삭제 오류 - 비밀번호 확인");
-        boardRepositoryCustom.deleteBoard(vo.getNo());
+        if(!passwordEncoder.matches(vo.getPw(), board.getPw()))
+            throw new RuntimeException("일반 게시판 삭제 오류 - 비밀번호 확인");
+       boardRepositoryCustom.deleteBoard(vo.getNo());
 
         return 1L;
     }

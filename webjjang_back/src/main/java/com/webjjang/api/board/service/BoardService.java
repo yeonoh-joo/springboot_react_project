@@ -1,5 +1,6 @@
 package com.webjjang.api.board.service;
 
+import com.webjjang.api.board.entity.Board;
 import com.webjjang.api.board.vo.BoardVO;
 import com.webjjang.api.util.page.PageObject;
 

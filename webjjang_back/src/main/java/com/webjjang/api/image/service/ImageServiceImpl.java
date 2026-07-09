@@ -9,6 +9,7 @@ import com.webjjang.api.image.entity.Image;
 import com.webjjang.api.image.repository.ImageRepositoryCustom;
 import com.webjjang.api.image.repository.QImageRepository;
 import com.webjjang.api.image.vo.ImageVO;
+import com.webjjang.api.member.entity.Member;
 import com.webjjang.api.util.page.PageObject;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,16 +104,20 @@ public class ImageServiceImpl implements ImageService {
         image.setTitle(vo.getTitle());
         image.setContent(vo.getContent());
         image.setFileName(vo.getFileName());
-        image.getMember().setId(vo.getId());
+        // image id 세팅하기 : member 생성 -> member에 id 세팅 -> image에 member 세팅
+        Member member = new Member();
+        member.setId(vo.getId());
+        image.setMember(member);
         image.setWritedDate(vo.getWritedDate());
         image.setUpdatedDate(vo.getUpdatedDate());
-        image.setHit(vo.getHit());
+        image.setHit(vo.getHit()==null?0:vo.getHit());
         return image;
     }
 
     @Override
     @Transactional
     public ImageVO write(ImageVO vo) {
+        log.info("[write] Image write : vo = {}", vo);
         Image image = imageRepositoryCustom.writeImage(
                 imageVOToImage(vo) // BoardVO -> Board
         );
@@ -123,14 +128,14 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @Transactional
     public Long update(ImageVO vo) {
-        log.info("[update] imageVOToImage(vo) = {}", imageVOToImage(vo));
+       log.info("[update] imageVOToImage(vo) = {}", imageVOToImage(vo));
 
-        Long result = imageRepositoryCustom.updateImage(vo.getTitle(), vo.getContent(), vo.getNo(), vo.getId());
+       Long result = imageRepositoryCustom.updateImage(vo.getTitle(), vo.getContent(), vo.getNo(), vo.getId());
 
-        if(result == 0)
-            throw new RuntimeException("이미지 게시판 수정 안됨 - 없는 이미지 게시글이거나 본인이 작성한 게시물이 아님.");
+       if(result == 0)
+           throw new RuntimeException("이미지 게시판 수정 안됨 - 없는 이미지 게시글이거나 본인이 작성한 게시물이 아님.");
 
-        return result;
+       return result;
     }
 
     @Override
@@ -139,11 +144,11 @@ public class ImageServiceImpl implements ImageService {
     public String delete(ImageVO vo) {
 
         // pw를 포함 데이터를 먼저 가져온다.
-        Optional<Image> optional = qImageRepository.findById(vo.getNo());
-        if(optional.isEmpty())
-            throw new RuntimeException("이미지 게시판 삭제 오류 - 글번호 확인");
-        Image image = optional.get();
-        imageRepositoryCustom.deleteImage(vo.getNo());
+       Optional<Image> optional = qImageRepository.findById(vo.getNo());
+       if(optional.isEmpty())
+           throw new RuntimeException("이미지 게시판 삭제 오류 - 글번호 확인");
+       Image image = optional.get();
+       imageRepositoryCustom.deleteImage(vo.getNo());
 
         return image.getFileName();
     }

@@ -2,6 +2,7 @@ package com.webjjang.api.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webjjang.api.data.dto.EntryPointErrorResponse;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;

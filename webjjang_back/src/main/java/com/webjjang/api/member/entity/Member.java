@@ -1,7 +1,6 @@
 package com.webjjang.api.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Check(constraints = "gender in ('여자', '남자')")
+@Check(constraints = "gender in ('남자','여자')")
 public class Member {
 
     @Id
@@ -38,7 +38,7 @@ public class Member {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, length = 2)
+    @Column(nullable = false)
     private String gender;
 
     @Column(nullable = false)
@@ -47,17 +47,16 @@ public class Member {
     private String tel;
 
     private String postNo;
-
     private String address;
 
     @Column(nullable = false)
     private String email;
 
     @CreatedDate
-    @Column(updatable = false)  // 한 번 등록하면 변경하지 않는다.
+    @Column(updatable = false) // 한번 등록하면 변경하지 않는다.
     private LocalDateTime regDate;
 
-    // 로그인을 하면 현재 날짜와 시간으로 변경시킨다.
+    // 로그인을 하면 현재 날자와 시간으로 변경시킨다.
     @CreatedDate
     private LocalDateTime conDate;
 
@@ -66,4 +65,6 @@ public class Member {
     @Builder.Default // new ArrayList<>() 를 보장한다. 데이터가 없어도 null이 되는 것을 막는다.
     // table로 생성 -> user_roles. user_id - user(id)와 연결
     private List<String> roles = new ArrayList<>();
+
+
 }

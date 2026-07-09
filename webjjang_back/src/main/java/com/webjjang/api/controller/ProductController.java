@@ -46,7 +46,7 @@ public class ProductController {
     // ResponseEntity<전달 데이터> - 전달 데이터 + 처리 상태
     // mapping 안에 내용이 없다. -> class 위에 매핑을 그대로 사용한다. 단, post 방식 처리
     @PostMapping()
-    @Operation(summary = "테스트 API")
+    @Operation(summary = "상품 등록")
     @Parameters({
             @Parameter(
                     name = "X-AUTH-TOKEN",

@@ -31,8 +31,8 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom{
                         image.no,
                         image.title,
                         image.fileName,
-                        image.member.id,
-                        image.member.name,
+                        image.member().id,
+                        image.member().name,
                         image.writedDate,
                         image.hit
                 )
@@ -62,7 +62,7 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom{
 
         // key에 w가 포함이 되어있으면 작성자에서 검색
         if(key.contains("i"))
-            builder.or(image.member.id.contains(word));
+            builder.or(image.member().id.contains(word));
 
         return builder;
     }
@@ -85,8 +85,8 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom{
                         image.title,
                         image.content,
                         image.fileName,
-                        image.member.id,
-                        image.member.name,
+                        image.member().id,
+                        image.member().name,
                         image.writedDate,
                         image.hit
                 )
@@ -121,16 +121,16 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom{
                 .update(image)
                 .set(image.title, title)
                 .set(image.content, content)
-                .where(image.no.eq(no), image.member.id.eq(id))
+                .where(image.no.eq(no), image.member().id.eq(id))
                 .execute();
-    }
+      }
 
     @Override
     public Long changeImage(Long no, String id, String fileName) {
         return queryFactory
                 .update(image)
                 .set(image.fileName, fileName)
-                .where(image.no.eq(no), image.member.id.eq(id))
+                .where(image.no.eq(no), image.member().id.eq(id))
                 .execute();
     }
 
