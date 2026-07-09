@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class ImageRestController {
 
     // 3. write
     @PostMapping("/write.do")
-    public ResponseEntity<String> write(@RequestBody ImageVO vo){
+    public ResponseEntity<String> write(@RequestBody ImageVO vo, MultipartFile imageFile){
         log.info("[write] vo = {}",vo);
         service.write(vo);
         return ResponseEntity.status(HttpStatus.OK)
@@ -67,6 +68,14 @@ public class ImageRestController {
         service.delete(vo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("일반 게시판 글삭제가 성공적으로 되었습니다.");
+    }
+
+    // 6. changeImage
+    public ResponseEntity<String> changeImage(@RequestBody Long no, MultipartFile changeImage) {
+        // 데이터 수집
+        // no : 파라미터로 넘어온다. fileName : changeImage 추출, id : 토큰
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("일반 게시판 이미지가 성공적으로 변경되었습니다.");
     }
 
 }

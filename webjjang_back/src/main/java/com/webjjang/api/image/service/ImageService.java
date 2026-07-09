@@ -15,7 +15,9 @@ public interface ImageService {
     ImageVO write(ImageVO vo);
     // 4. update
     Long update(ImageVO vo);
-    // 5. delete
-    Long delete(ImageVO vo);
+    // 5. delete - 삭제 후 삭제할 파일명을 리턴해 준다.
+    String delete(ImageVO vo);
+    // 6. changeImage
+    Long changeImage(ImageVO vo);
 
 }

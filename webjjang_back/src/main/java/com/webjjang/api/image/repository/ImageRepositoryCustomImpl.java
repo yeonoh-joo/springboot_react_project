@@ -3,16 +3,19 @@ package com.webjjang.api.image.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.webjjang.api.image.entity.QImage;
+import com.webjjang.api.board.entity.Board;
 import com.webjjang.api.image.entity.Image;
+import com.webjjang.api.image.entity.QImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor // private 이면서 final 붙인 변수를 자동 DI 해준다. 생성자를 이용한다.
-public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
+public class ImageRepositoryCustomImpl implements ImageRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
     private final QImageRepository qImageRepository;
@@ -27,10 +30,11 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
                 .select(
                         image.no,
                         image.title,
+                        image.fileName,
                         image.member.id,
                         image.member.name,
-                        image.hit,
-                        image.writeDate
+                        image.writedDate,
+                        image.hit
                 )
                 .from(image)
                 .where(search(key, word)) // BooleanBuilder - true || false
@@ -73,15 +77,17 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
     }
 
     @Override
+    // 기본 쿼리 가능 - findById(Long no) -> Factory 보안 때문에
     public Tuple getImage(Long no) {
         return queryFactory
                 .select(
                         image.no,
                         image.title,
                         image.content,
+                        image.fileName,
                         image.member.id,
                         image.member.name,
-                        image.writeDate,
+                        image.writedDate,
                         image.hit
                 )
                 .from(image)
@@ -90,9 +96,9 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
     }
 
     @Override
-    // 1. 방법 : 기본 CRUD의 수정은 먼저 데이터를 꺼내온다(findById()) -> 꺼내온 데이터 변경(JAVA에서)
-    // -> 수정된 내용은 DB에 저장(save()) : @LastModifiedDate 수정날짜 자동 변경됨
-    // 2. QueryFactory 사용 : 수정 쿼리 실행 - @LastModifiedDate 수정날짜 자동 변경 안 됨
+    // 1 방법. : 기본 CRUD의 수정은 먼저 데이터를 꺼내온다(findById()) -> 꺼내온 데이터 변경(JAVA에서)
+    // -> 수정된 내용을 DB에 저장(save()) : @LastModifedDate 수정날짜 자동 변경 됨
+    // 2. QueryFactory 사용 : 수정 쿼리 실행 - @LastModifedDate 수정날짜 자동 변경 안됨
     public Long increaseHit(Long no) {
         return queryFactory
                 .update(image)
@@ -107,11 +113,25 @@ public class ImageRepositoryCustomImpl implements ImageRepositoryCustom {
     }
 
     @Override
-    // 1. 방법 : 기본 CRUD의 수정은 먼저 데이터를 꺼내온다(findById()) -> 꺼내온 데이터 변경(JAVA에서)
-    // -> 수정된 내용은 DB에 저장(save()) : @LastModifiedDate 수정날짜 자동 변경됨
-    // 2. QueryFactory 사용 : 수정 쿼리 실행 - @LastModifiedDate 수정날짜 자동 변경 안 됨
-    public Image updateImage(Image imageData) {
-        return qImageRepository.save(imageData);
+    // 1 방법. : 기본 CRUD의 수정은 먼저 데이터를 꺼내온다(findById()) -> 꺼내온 데이터 변경(JAVA에서)
+    // -> 수정된 내용을 DB에 저장(save()) : @LastModifedDate 수정날짜 자동 변경 됨
+    // 2. QueryFactory 사용 : 수정 쿼리 실행 - @LastModifedDate 수정날짜 자동 변경 안됨
+    public Long updateImage(String title, String content, Long no, String id) {
+        return queryFactory
+                .update(image)
+                .set(image.title, title)
+                .set(image.content, content)
+                .where(image.no.eq(no), image.member.id.eq(id))
+                .execute();
+    }
+
+    @Override
+    public Long changeImage(Long no, String id, String fileName) {
+        return queryFactory
+                .update(image)
+                .set(image.fileName, fileName)
+                .where(image.no.eq(no), image.member.id.eq(id))
+                .execute();
     }
 
     @Override
