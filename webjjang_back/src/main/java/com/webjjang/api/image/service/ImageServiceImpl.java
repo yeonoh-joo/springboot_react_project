@@ -117,7 +117,6 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @Transactional
     public ImageVO write(ImageVO vo) {
-        log.info("[write] Image write : vo = {}", vo);
         Image image = imageRepositoryCustom.writeImage(
                 imageVOToImage(vo) // BoardVO -> Board
         );

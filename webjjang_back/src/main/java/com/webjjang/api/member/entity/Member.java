@@ -54,7 +54,7 @@ public class Member {
 
     @CreatedDate
     @Column(updatable = false) // 한번 등록하면 변경하지 않는다.
-    private LocalDateTime regDate;
+    private LocalDateTime writeDate;
 
     // 로그인을 하면 현재 날자와 시간으로 변경시킨다.
     @CreatedDate

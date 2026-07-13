@@ -3,6 +3,8 @@ import TopNavi from "./components/common/TopNavi"
 import Home from "./components/common/Home"
 import NotFoundMenu from "./components/error/NotFoundMenu"
 import BoardComp from "./components/board/BoardComp"
+import ImageComp from "./components/image/ImageComp"
+import MemberComp from "./components/member/MemberComp"
 
 function App() {
 
@@ -11,11 +13,13 @@ function App() {
       {/* 맨 위에 메뉴 컴포넌트 : /src/components/common/TopNavi.jsx */}
       <TopNavi />
 
-      <div className="container">
+      <div className="container pt-5">
       {/* 라이팅 - 메뉴별 */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/board/*" element={<BoardComp />} />
+          <Route path="/image/*" element={<ImageComp />} />
+          <Route path="/member/*" element={<MemberComp />} />
           <Route path="*" element={<NotFoundMenu />} />
         </Routes>
       </div>

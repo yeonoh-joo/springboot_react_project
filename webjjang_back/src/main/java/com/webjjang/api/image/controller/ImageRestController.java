@@ -12,6 +12,8 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +40,7 @@ public class ImageRestController {
 
     private final ImageService service;
 
-    private final String savePath = "c:/upload/image"; // realPath
+    private final String savePath = "c:/upload/image/"; // realPath
 
     // 1. list
     @GetMapping("/list.do")
@@ -57,19 +60,51 @@ public class ImageRestController {
     // 2. view
     @GetMapping("/view.do")
     public ResponseEntity<ImageVO> view(Long no, Integer inc){
+        log.info("[view] no = {}, inc = {}",no, inc);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(service.view(no, inc));
     }
+//   localhost/image/~~~.jpg
+//    @GetMapping("/{fileName}") - config.WebConfig에서 설정 처리하는 방법이 더 간편.
+    public ResponseEntity<Resource> viewImage(
+            @PathVariable String fileName) throws MalformedURLException {
+
+        log.info("[viewImage] 이미지 보기 처리되고 있음.");
+        Path path = Paths.get(savePath).resolve(fileName);
+
+        Resource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType;
+
+        try {
+            contentType = Files.probeContentType(path);
+        } catch (IOException e) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+    }
+
 
     // 3. write
     @PostMapping(value = "/write.do",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> write(
-            @Parameter(description = "이미지 정보", content =
-            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema =
-            @Schema(implementation = ImageVO.class)))
-            @RequestPart("vo") ImageVO vo,
-            @RequestPart("imageFile") MultipartFile imageFile) throws IOException {
+            @Parameter(
+                    description = "이미지 정보",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ImageVO.class)
+                    )
+            )
+            @RequestPart ImageVO vo,
+            @RequestPart MultipartFile imageFile) throws IOException {
         log.info("[write] vo = {}, fileName = {}",
                 vo, imageFile.getOriginalFilename());
         // 데이터 세팅 - title, content 전달 받음. id : 헤더의 토큰으로 전달 받는다.(하드코딩)
@@ -80,7 +115,9 @@ public class ImageRestController {
         String extension = null;
         if (originalFilename != null && originalFilename.contains(".")) {
             // .을 포함한 확장자를 구하자.
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            extension = originalFilename.substring(
+                    originalFilename.lastIndexOf(".")
+            );
         } else {
             throw  new RuntimeException("이미지가 첨부되어야만 합니다.");
         }
